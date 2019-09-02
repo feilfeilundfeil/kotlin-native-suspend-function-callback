@@ -1,6 +1,7 @@
-package de.jensklingenberg
+package de.ffuf.kotlin.multiplatform.processor.registrar
 
 import com.google.auto.service.AutoService
+import de.ffuf.kotlin.multiplatform.processor.NativeSuspendedFunctionProcessor
 import de.jensklingenberg.mpapt.common.MpAptProject
 import org.jetbrains.kotlin.codegen.extensions.ClassBuilderInterceptorExtension
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
@@ -17,15 +18,15 @@ import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 open class CommonComponentRegistrar : ComponentRegistrar {
 
     override fun registerProjectComponents(
-            project: MockProject,
-            configuration: CompilerConfiguration
+        project: MockProject,
+        configuration: CompilerConfiguration
     ) {
-        val processor = MpAptTestProcessor(configuration)
+        val processor = NativeSuspendedFunctionProcessor(configuration)
         val mpapt = MpAptProject(processor)
-        StorageComponentContainerContributor.registerExtension(project,mpapt)
+        StorageComponentContainerContributor.registerExtension(project, mpapt)
         SyntheticResolveExtension.registerExtension(project, mpapt)
-        ClassBuilderInterceptorExtension.registerExtension(project,mpapt)
-        JsSyntheticTranslateExtension.registerExtension(project,mpapt)
+        ClassBuilderInterceptorExtension.registerExtension(project, mpapt)
+        JsSyntheticTranslateExtension.registerExtension(project, mpapt)
     }
 }
 

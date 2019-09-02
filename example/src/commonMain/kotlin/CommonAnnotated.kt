@@ -1,41 +1,13 @@
-@file:TestFile
-
 package de.jensklingenberg.mpapt
 
-import de.jensklingenberg.testAnnotations.*
+import de.ffuf.kotlin.multiplatform.annotations.NativeSuspendedFunction
 
 
-@TestClass
-class CommonAnnotated @TestConstructor constructor() {
+class CommonAnnotated constructor() {
 
-
-    @TestConstructor
-    constructor(name: String) : this()
-
-    @TestProperty
-    @TestField
-    lateinit var myProperty: @TestType String
-
-    var jens: String
-        @TestPropertyGetter get() {
-            return "Hello"
-        }
-        @TestPropertySetter set(value) {
-
-        }
-
-    @TestFunction
-    fun firstFunction() {
-
+    @NativeSuspendedFunction
+    @PublishedApi
+    internal suspend fun firstFunction2(id: Int): Int {
+        return 0
     }
-
-    @TestFunction
-    fun secondFunction() {
-
-    }
-
-    fun thirdFunction(@TestValueParameter param: String, @TestValueParameter param2: String) {
-
-    }
-
 }

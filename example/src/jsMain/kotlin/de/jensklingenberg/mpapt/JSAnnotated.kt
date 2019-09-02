@@ -1,36 +1,9 @@
-import de.jensklingenberg.testAnnotations.*
+import de.ffuf.kotlin.multiplatform.annotations.NativeSuspendedFunction
 
+class Annotated {
 
-@TestClass
-class Annotated @TestConstructor constructor() {
-
-    @TestConstructor
-    constructor(name: String) : this()
-
-    @TestProperty
-    @TestField
-    lateinit var myProperty: @TestType String
-
-    var jens: String
-        @TestPropertyGetter get() {
-            return "Hello"
-        }
-        @TestPropertySetter set(value) {
-
-        }
-
-    @TestFunction
+    @NativeSuspendedFunction
     fun firstFunction() {
 
     }
-
-    @TestFunction
-    fun secondFunction() {
-
-    }
-
-    fun thirdFunction(@TestValueParameter param: String, @TestValueParameter param2: String) {
-
-    }
-
 }
