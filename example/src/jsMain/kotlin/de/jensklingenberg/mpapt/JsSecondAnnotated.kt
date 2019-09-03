@@ -1,23 +1,12 @@
 package de.jensklingenberg.mpapt
 
-import de.jensklingenberg.testAnnotations.TestClass
-import de.jensklingenberg.testAnnotations.TestFunction
-import de.jensklingenberg.testAnnotations.TestProperty
-import de.jensklingenberg.testAnnotations.TestValueParameter
+import de.ffuf.kotlin.multiplatform.annotations.NativeSuspendedFunction
 
 
-@TestClass
 class JsSecondAnnotated {
 
-    @TestProperty
-    val name: String? = null
-
-    @TestFunction
+    @NativeSuspendedFunction
     fun what() {
-
-    }
-
-    fun elses(@TestValueParameter param: String) {
 
     }
 

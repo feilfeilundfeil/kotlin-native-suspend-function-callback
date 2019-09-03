@@ -22,9 +22,9 @@ plugins {
 
 }
 
-group = "de.jensklingenberg.mpapt.testAnnotations"
+group = "de.ffuf.kotlin.multiplatform.annotations"
 
-version = "0.0.1"
+version = "0.0.2"
 
 
 repositories {
@@ -34,7 +34,6 @@ repositories {
 kotlin {
     jvm()
     js()
-    linuxX64("linux")
 
     sourceSets {
         commonMain {

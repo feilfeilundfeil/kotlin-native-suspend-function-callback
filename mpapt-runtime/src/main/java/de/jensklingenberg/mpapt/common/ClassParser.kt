@@ -31,7 +31,7 @@ class ClassParser() {
                     processor.process(roundEnvironment)
                 }
 
-                parseClassConstructor(descriptor, processor, roundEnvironment, annotation)
+                //parseClassConstructor(descriptor, processor, roundEnvironment, annotation)
 
 
             }

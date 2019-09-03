@@ -25,9 +25,9 @@ apply plugin: "maven"
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'maven-publish'
 
-group = "de.jensklingenberg"
-archivesBaseName = "kotlin-compiler-native-plugin"
-version = "0.0.1"
+group = "de.ffuf.kotlin.multiplatform.processor"
+archivesBaseName = "nativesuspendfunction-native-compiler"
+version = "0.0.2"
 
 
 repositories {
@@ -60,10 +60,10 @@ task fatJar(type: Jar) {
     manifest {
         attributes 'Implementation-Title': 'Gradle Jar File Example',
                 'Implementation-Version': version,
-                'Main-Class': 'de.jensklingenberg.common.NativeComponentRegistrar'
+                'Main-Class': 'de.ffuf.kotlin.multiplatform.processor.NativeComponentRegistrar'
     }
-    baseName = "kotlin-compiler-native-plugin"
-    version = "0.0.1"
+    baseName = "nativesuspendfunction-native-compiler"
+    version = "0.0.2"
 
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
@@ -74,8 +74,8 @@ shadowJar {
     manifest {
         inheritFrom project.tasks.fatJar.manifest
     }
-    baseName = "kotlin-compiler-native-plugin"
-    version = "0.0.1"
+    baseName = "nativesuspendfunction-native-compiler"
+    version = "0.0.2"
     classifier = null
 }
 

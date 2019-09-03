@@ -10,23 +10,11 @@
 
 
 ## Introduction 🙋‍♂️ 🙋‍
-I wrote an annotation processing libary that can detect annotations in Kotlin Native/JS and Jvm projects, because Kapt is only working with KotlinJvm. The library can be used in Kotlin Compiler plugins. Tested with Kotlin 1.3.41 and 1.3.50
+As suspended functions aren't visible from Kotlin Native I created this plugin that adds support for annotating existing
+functions with `@NativeSuspendedFunction`. The plugin will find these methods and generate a Kotlin source code file 
+that uses callbacks that can be used from Kotlin Native.
 
-It can detect annotations with following targets: 
-```groovy
-(CLASS,FUNCTION,PROPERTY,VALUE_PARAMETER,PROPERTY_GETTER,PROPERTY_GETTER,CONSTRUCTOR)
-```
-
-<p align="left">
-  Example output of my example plugin on Kotlin Native:
-  <img src ="https://raw.githubusercontent.com/Foso/MpApt/master/docs/images/logNative.png"  />
-</p>
-
-
-### Show some :heart: and star the repo to support the project
-
-[![GitHub stars](https://img.shields.io/github/stars/Foso/MpApt.svg?style=social&label=Star)](https://github.com/Foso/MpApt) [![GitHub forks](https://img.shields.io/github/forks/Foso/MpApt.svg?style=social&label=Fork)](https://github.com/Foso/MpApt/fork) [![GitHub watchers](https://img.shields.io/github/watchers/Foso/MpApt.svg?style=social&label=Watch)](https://github.com/Foso/MpApt) [![Twitter Follow](https://img.shields.io/twitter/follow/jklingenberg_.svg?style=social)](https://twitter.com/jklingenberg_)
-
+This plugin uses mpapt-runtime from Jens Klingenberg: https://github.com/Foso/MpApt
 
 ## Usage
 
@@ -38,90 +26,10 @@ repositories {
 }
 
 dependencies {
-   compile 'de.jensklingenberg:mpapt-runtime:0.8.0'
+   compile 'de.ffuf.kotlin.multiplatform.annotation:mpapt-runtime:0.8.0'
 }
 ```
-1) Create a class that extends de.jensklingenberg.mpapt.model.AbstractProcessor
 
-```kotlin
-class MpAptTestProcessor(configuration: CompilerConfiguration) : AbstractProcessor(configuration) {
-
-```
-2) Add the names of your annotations that you want to detect:
-```kotlin
-override fun getSupportedAnnotationTypes(): Set<String> = setOf(TestClass::class.java.name, TestFunction::class.java.name)
-```
-3) Do something with detected annotations:
-```kotlin
-override fun process(roundEnvironment: RoundEnvironment) {
-roundEnvironment.getElementsAnnotatedWith(TestClass::class.java.name).forEach {
-            when (it) {
-                is Element.ClassElement -> {
-                    log("Found Class: " + it.classDescriptor.name + " Module: " + it.classDescriptor.module.simpleName() + " platform   " + activeTargetPlatform.first().platformName)
-                }
-            }
-        }
-
-        roundEnvironment.getElementsAnnotatedWith(TestFunction::class.java.name).forEach {
-            when (it) {
-                is Element.FunctionElement -> {
-                    log("Found Function: " + it.func.name + " Module: " + it.func.module.simpleName() + " platform   " + activeTargetPlatform.first().platformName)
-                }
-            }
-        }
-}
-```
-4)  Init MpApt inside your ComponentRegistrar:
-* Pass an instance of your processor into MpAptProject
-* Then add an instance of MpAptProject to the following extension classes:
-
-Inside a Kotlin Native Compiler Plugin:
-```kotlin
-override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
-        val generator = MpAptTestProcessor(configuration)
-        val mpapt = MpAptProject(generator)
-
-        StorageComponentContainerContributor.registerExtension(project,mpapt)
-        SyntheticResolveExtension.registerExtension(project, mpapt)
-        IrGenerationExtension.registerExtension(project,mpapt)
-    }
-```
-
-Inside a Kotlin JVM/JS Compiler Plugin:
-```kotlin
- override fun registerProjectComponents(
-            project: MockProject,
-            configuration: CompilerConfiguration
-    ) {
-        val processor = MpAptTestProcessor(configuration)
-        val mpapt = MpAptProject(processor)
-        StorageComponentContainerContributor.registerExtension(project,mpapt)
-        SyntheticResolveExtension.registerExtension(project, mpapt)
-        ClassBuilderInterceptorExtension.registerExtension(project,mpapt)
-        JsSyntheticTranslateExtension.registerExtension(project,mpapt)
-    }
-```
-5) That's it
-
-## ✍️ Feedback
-
-Feel free to send feedback on [Twitter](https://twitter.com/jklingenberg_) or [file an issue](https://github.com/foso/MpApt/issues/new). Feature requests are always welcome. If you wish to contribute, please take a quick look at [How to develop?](https://github.com/Foso/MpApt/wiki/How-to-develop%3F)
-
-### 👷 Development Project Structure
- 	
-* <kbd>demoProject</kbd> - An example project that is using MpApt+KotlinPoet to generate code on KotlinJS
-* <kbd>annotations</kbd> - A Kotlin Multiplatform project which contains test annotations 
-* <kbd>example</kbd> - A Kotlin Multiplatform project which applies a gradle plugin(de.jensklingenberg.mpapt) whichs triggers the compiler plugin.
-* <kbd>buildSrc</kbd> - This module contains the gradle plugin which trigger the compiler plugin
-* <kbd>kotlin-plugin</kbd> - This module contains the Kotlin Compiler Plugin for JVM/JS targets, it implements the <kbd>kotlin-plugin-shared</kbd>-module
-* <kbd>kotlin-compiler-native-plugin</kbd> - This module contains the Kotlin Compiler Plugin for Native targets, it implements the <kbd>kotlin-plugin-shared</kbd>-module
-* <kbd>kotlin-plugin-shared</kbd> Contains an implementation of MpApt
-
-
-# See also
-* [How to use a Kotlin Compiler Plugin from Gradle Plugin](https://github.com/Foso/MpApt/wiki/How-to-use-a-Kotlin-Compiler-Plugin-from-Gradle-Plugin)
-* [How to write a Kotlin Compiler Plugin](https://github.com/Foso/MpApt/wiki/How-to-write-a-Kotlin-Compiler-Plugin)
-* [How to debug Kotlin Compiler Plugin](https://github.com/Foso/MpApt/wiki/How-to-debug-Kotlin-Compiler-Plugin)
 
 ## 📜 License
 
@@ -129,7 +37,7 @@ This project is licensed under the Apache License, Version 2.0 - see the [LICENS
 
 -------
 
-    Copyright 2019 Jens Klingenberg
+    Copyright 2019 FFUF
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

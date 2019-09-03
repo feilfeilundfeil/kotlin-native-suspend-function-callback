@@ -9,3 +9,7 @@
 /build/
 /mpapt-runtime/build/*
 /kotlin-plugin-shared/build/
+/buildSrc/build/
+/buildSrc/.gradle/
+/kotlin-compiler-native-plugin/out/
+/mpapt-runtime/out/
