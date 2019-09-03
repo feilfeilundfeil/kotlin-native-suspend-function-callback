@@ -1,10 +1,11 @@
-<h1 align="center">MpApt - Kotlin (Native/JS/JVM) Annotation Processor library</h1>
+<h1 align="center">Native Suspended Functions - Generates a wrapper with a callback for suspended functions for Kotlin Native to consume</h1>
 
-[![jCenter](https://img.shields.io/badge/Kotlin-1.3.50-green.svg
-)](https://github.com/Foso/MpApt/blob/master/LICENSE)[![jCenter](https://img.shields.io/badge/Apache-2.0-green.svg)](https://github.com/Foso/MpApt/blob/master/LICENSE)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.50-green.svg)](https://github.com/Foso/MpApt/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/Apache-2.0-green.svg)](https://github.com/Foso/MpApt/blob/master/LICENSE)
+[![Jitpack](https://jitpack.io/v/feilfeilundfeil/kotlin-native-suspend-function-callback.svg)](https://jitpack.io/#feilfeilundfeil/kotlin-native-suspend-function-callback)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-range.svg?style=flat-square)](#contributors)
-  <a href="https://twitter.com/intent/tweet?text=Hey, check out MpApt https://github.com/Foso/MpApt via @jklingenberg_ #Android 
+  <a href="https://twitter.com/intent/tweet?text=Hey, check out Native Suspended Functions https://github.com/feilfeilundfeil/kotlin-native-suspend-function-callback via @boni2k #Kotlin 
 "><img src="https://img.shields.io/twitter/url/https/github.com/angular-medellin/meetup.svg?style=social" alt="Tweet"></a>
 
 
@@ -22,7 +23,6 @@ Class with annotated suspended function:
 class CommonAnnotated {
 
     @NativeSuspendedFunction
-    @PublishedApi
     internal suspend fun firstFunction2(id: Datum, type: Double?): Int {
         return 0
     }
@@ -30,7 +30,6 @@ class CommonAnnotated {
 ```
 Generated extension:
 ```kotlin
-@PublishedApi
 internal fun CommonAnnotated.firstFunction2(
     id: Datum,
     type: Double?,
@@ -41,6 +40,11 @@ internal fun CommonAnnotated.firstFunction2(
 ```
 The class `SuspendResult` is an implementation of https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-result/index.html
 that was made compatible with Kotlin Native (no inline functions etc.)
+
+Currently the plugin only supports:
+[] copying over annotations
+[] parameters + their nullability (no default values)
+Please check other limitations on https://github.com/Foso/MpApt
 
 ## Usage
 
