@@ -19,8 +19,14 @@ class NativeSuspendFunctionsGradleSubplugin : KotlinGradleSubplugin<AbstractComp
         androidProjectHandler: Any?,
         kotlinCompilation: KotlinCompilation<KotlinCommonOptions>?
     ): List<SubpluginOption> {
-        return emptyList()
 
+        val extension = project.extensions.getByType(NativeSuspendFunctionsExtension::class.java)
+
+        return listOf(
+            SubpluginOption(NativeSuspendFunctionsExtension::scopeName.name, extension.scopeName),
+            SubpluginOption(NativeSuspendFunctionsExtension::outputDirectory.name, extension.outputDirectory),
+            SubpluginOption(NativeSuspendFunctionsExtension::imports.name, extension.imports.joinToString("&"))
+        )
     }
 
     override fun isApplicable(project: Project, task: AbstractCompile) =

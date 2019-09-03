@@ -4,22 +4,31 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import de.ffuf.kotlin.multiplatform.annotations.NativeSuspendedFunction
 import de.ffuf.kotlin.multiplatform.annotations.SuspendResult
+import de.ffuf.kotlin.multiplatform.processor.NativeSuspendedFunctionKeys.IMPORTS
+import de.ffuf.kotlin.multiplatform.processor.NativeSuspendedFunctionKeys.OUTPUTDIRECTORY
+import de.ffuf.kotlin.multiplatform.processor.NativeSuspendedFunctionKeys.SCOPENAME
 import de.jensklingenberg.mpapt.common.*
 import de.jensklingenberg.mpapt.model.AbstractProcessor
 import de.jensklingenberg.mpapt.model.Element
 import de.jensklingenberg.mpapt.model.RoundEnvironment
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.descriptors.EffectiveVisibility
 import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import java.io.File
-import java.io.PrintWriter
-import java.io.StringWriter
 
+object NativeSuspendedFunctionKeys {
+    val IMPORTS: CompilerConfigurationKey<String> =
+        CompilerConfigurationKey.create("additional import statements")
 
+    val SCOPENAME: CompilerConfigurationKey<String> = CompilerConfigurationKey.create("scope name to use")
 
-
+    val OUTPUTDIRECTORY: CompilerConfigurationKey<String> = CompilerConfigurationKey.create(
+        "output directory of generated classes (excluding package name)"
+    )
+}
 private const val TAG = "NativeSuspendedFunctionProcessor"
 
 class NativeSuspendedFunctionProcessor(configuration: CompilerConfiguration) : AbstractProcessor(configuration) {
@@ -33,7 +42,7 @@ class NativeSuspendedFunctionProcessor(configuration: CompilerConfiguration) : A
             when (it) {
                 is Element.FunctionElement -> {
                     if (it.func.isSuspend) {
-                        log("Found SUSPENDEDZZ Function: " + it.func.name + " Module: " + it.func.module.simpleName() + " platform   " + activeTargetPlatform.first().platformName)
+                        log("Found suspended Function: " + it.func.name + " Module: " + it.func.module.simpleName() + " platform " + activeTargetPlatform.first().platformName)
 
                         val packageName = it.descriptor.original.containingDeclaration.fqNameSafe.asString()
                         val className = it.descriptor.defaultType.toString()
@@ -42,8 +51,21 @@ class NativeSuspendedFunctionProcessor(configuration: CompilerConfiguration) : A
                         if (fileBuilder == null) {
                             fileBuilder = FileSpec.builder(packageName, generatedClassName)
                                 .addImport("de.ffuf.kotlin.multiplatform.annotations", "suspendRunCatching")
-                            outputFile = File(it.descriptor.guessingProjectFolder(), "src/commonMain/kotlin")
-                            log("WRITING TO $packageName")
+                                .addImport("kotlinx.coroutines", "launch")
+                            outputFile = File(
+                                it.descriptor.guessingProjectFolder(), configuration.get(
+                                    OUTPUTDIRECTORY, "src/commonMain/kotlin"
+                                )
+                            )
+                            val imports: String? = configuration.get(IMPORTS)
+                            imports?.let { imports ->
+                                imports.split("&").forEach { import ->
+                                    fileBuilder?.addImport(
+                                        import.split(".").dropLast(1).joinToString("."),
+                                        import.split(".").last()
+                                    )
+                                }
+                            }
                         }
 
                         val returnType = if (it.func.returnType != null) {
@@ -52,7 +74,6 @@ class NativeSuspendedFunctionProcessor(configuration: CompilerConfiguration) : A
                         } else {
                             Unit::class.asTypeName()
                         }
-                        log("Return type: $returnType")
 
                         fileBuilder?.addFunction(
                             FunSpec.builder(it.func.name.identifier)
@@ -96,7 +117,10 @@ class NativeSuspendedFunctionProcessor(configuration: CompilerConfiguration) : A
                                 )
                                 .addCode(buildCodeBlock {
 
-                                    beginControlFlow("return mainScope.launch {")
+                                    val scopeName = configuration.get(
+                                        SCOPENAME, "mainScope"
+                                    )
+                                    beginControlFlow("return $scopeName.launch {")
                                     val originalCall =
                                         "${it.func.name}(${it.func.getFunctionParameters().joinToString(", ") { param -> param.parameterName }})"
                                     addStatement("callback(suspendRunCatching<%T> { $originalCall })", returnType)
@@ -121,20 +145,10 @@ class NativeSuspendedFunctionProcessor(configuration: CompilerConfiguration) : A
 
         fileBuilder?.build()?.let {
             outputFile?.let { file ->
-                val str = StringBuilder()
-                it.writeTo(str)
-                log("FILE: $file, builderzzz: ${str}")
-                try {
-                    if (!file.exists()) {
-                        file.createNewFile()
-                    }
-                    it.writeTo(file)
-                } catch (e: Exception) {
-                    log(e.toString())
-                    val errors = StringWriter()
-                    e.printStackTrace(PrintWriter(errors))
-                    log(errors.toString())
+                if (!file.exists()) {
+                    file.createNewFile()
                 }
+                it.writeTo(file)
             }
 
         }

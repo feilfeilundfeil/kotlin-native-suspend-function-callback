@@ -37,6 +37,10 @@ allprojects {
     }
 }
 
+nativeSuspendExtension {
+    scopeName = "1337"
+    imports = ["timmey", "tamey"]
+}
 
 allprojects {
     ext.buildMaven = { p -> repositories { maven { url p } } }
