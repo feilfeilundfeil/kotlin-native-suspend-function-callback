@@ -38,8 +38,6 @@ allprojects {
 }
 
 nativeSuspendExtension {
-    scopeName = "1337"
-    imports = ["timmey", "tamey"]
 }
 
 allprojects {

@@ -4,7 +4,7 @@ import de.ffuf.kotlin.multiplatform.annotations.NativeSuspendedFunction
 
 typealias Datum = CharProgression
 
-class CommonAnnotated constructor() {
+class CommonAnnotated {
 
     @NativeSuspendedFunction
     @PublishedApi

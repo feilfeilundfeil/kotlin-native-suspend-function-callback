@@ -16,24 +16,74 @@ that uses callbacks that can be used from Kotlin Native.
 
 This plugin uses mpapt-runtime from Jens Klingenberg: https://github.com/Foso/MpApt
 
+## Example
+Class with annotated suspended function:
+```kotlin
+class CommonAnnotated {
+
+    @NativeSuspendedFunction
+    @PublishedApi
+    internal suspend fun firstFunction2(id: Datum, type: Double?): Int {
+        return 0
+    }
+}
+```
+Generated extension:
+```kotlin
+@PublishedApi
+internal fun CommonAnnotated.firstFunction2(
+    id: Datum,
+    type: Double?,
+    callback: (SuspendResult<Int>) -> Unit
+) = mainScope.launch {
+    callback(suspendRunCatching<Int> { firstFunction2(id, type) })
+}
+```
+The class `SuspendResult` is an implementation of https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-result/index.html
+that was made compatible with Kotlin Native (no inline functions etc.)
+
 ## Usage
 
-Inside your compiler plugin, add the dependency from MavenCentral 
+Inside your projects build.gradle(.kts) add the following plugin: 
 
-```groovy
+```kotlin
 repositories {
     mavenCentral()
 }
 
-dependencies {
-   compile 'de.ffuf.kotlin.multiplatform.annotation:mpapt-runtime:0.8.0'
+plugins {
+   id("native-suspend-function") version "1.0.1"
+    // or as dependency: "de.ffuf.kotlin.multiplatform.processor:nativesuspendfunction:1.0.1"
+}
+```
+and in your `pluginManagement`:
+```kotlin
+pluginManagement {
+    // ....
+    resolutionStrategy {
+        eachPlugin {
+            // ....
+            if (requested.id.id == "native-suspend-function") {
+                useModule("de.ffuf.kotlin.multiplatform.processor:nativesuspendfunction:${requested.version}")
+            }
+        }
+    }
 }
 ```
 
+## Configuration
+The compiler plugin unfortunately won't be able to resolve all needed imports but you may add them in the configuration:
+```kotlin
+nativeSuspendExtension {
+    outputDirectory = "src/commonMain/kotlin" // this is the default output directory for the generated files (without package)
+    scopeName = "mainScope" // in our case we use a CoroutineScope called "mainScope" - don#t forget to import that location 
+    imports = listOf("test.import.package") // additional imports for the generated file
+}
+```
 
 ## 📜 License
 
-This project is licensed under the Apache License, Version 2.0 - see the [LICENSE.md](https://github.com/Foso/MpApt/blob/master/LICENSE) file for details
+This project is licensed under the Apache License, Version 2.0 - see the [LICENSE.md](https://github.com/feilfeilundfeil/kotlin-native-suspend-function-callback/blob/master/LICENSE) file for details
 
 -------
 
