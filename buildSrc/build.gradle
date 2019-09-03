@@ -30,23 +30,23 @@ apply plugin: "kotlin-kapt"
 apply plugin: "maven"
 
 
-group = "de.jensklingenberg"
-archivesBaseName = "mpapt-gradle"
-version = "1.0.0"
+group = "de.ffuf.kotlin.multiplatform.processor"
+archivesBaseName = "nativesuspendfunction"
+version = "1.0.1"
 
 
 
 install {
     repositories.mavenInstaller {
-        pom.artifactId = 'mpapt-gradle'
+        pom.artifactId = archivesBaseName
     }
 }
 
 gradlePlugin {
     plugins {
         simplePlugin {
-            id = "de.jensklingenberg.mpapt" // users will do `apply plugin: "de.jensklingenberg.mpapt"`
-            implementationClass = "de.jensklingenberg.mpapt.MpAptGradlePlugin" // entry-point class
+            id = "native-suspend-function" // users will do `apply plugin: "de.jensklingenberg.mpapt"`
+            implementationClass = "de.ffuf.kotlin.multiplatform.processor.NativeSuspendFunctionsGradlePlugin" // entry-point class
         }
     }
 }

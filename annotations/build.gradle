@@ -24,7 +24,7 @@ plugins {
 
 group = "de.ffuf.kotlin.multiplatform.annotations"
 
-version = "0.0.1"
+version = "0.0.2"
 
 
 repositories {

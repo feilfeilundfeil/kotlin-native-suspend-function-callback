@@ -4,8 +4,7 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import de.ffuf.kotlin.multiplatform.annotations.NativeSuspendedFunction
 import de.ffuf.kotlin.multiplatform.annotations.SuspendResult
-import de.jensklingenberg.mpapt.common.getFunctionParameters
-import de.jensklingenberg.mpapt.common.simpleName
+import de.jensklingenberg.mpapt.common.*
 import de.jensklingenberg.mpapt.model.AbstractProcessor
 import de.jensklingenberg.mpapt.model.Element
 import de.jensklingenberg.mpapt.model.RoundEnvironment
@@ -15,37 +14,45 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import java.io.File
+import java.io.PrintWriter
+import java.io.StringWriter
+
+
+
 
 private const val TAG = "NativeSuspendedFunctionProcessor"
 
 class NativeSuspendedFunctionProcessor(configuration: CompilerConfiguration) : AbstractProcessor(configuration) {
 
     private val testFunction = NativeSuspendedFunction::class.java.name
+    var fileBuilder: FileSpec.Builder? = null
+    var outputFile: File? = null
 
     override fun process(roundEnvironment: RoundEnvironment) {
-        var fileBuilder: FileSpec.Builder? = null
-
         roundEnvironment.getElementsAnnotatedWith(NativeSuspendedFunction::class.java.name).forEach {
             when (it) {
                 is Element.FunctionElement -> {
                     if (it.func.isSuspend) {
-                        log("Found SUSPENDED Function: " + it.func.name + " Module: " + it.func.module.simpleName() + " platform   " + activeTargetPlatform.first().platformName)
+                        log("Found SUSPENDEDZZ Function: " + it.func.name + " Module: " + it.func.module.simpleName() + " platform   " + activeTargetPlatform.first().platformName)
 
                         val packageName = it.descriptor.original.containingDeclaration.fqNameSafe.asString()
                         val className = it.descriptor.defaultType.toString()
-                        val generatedClassName = "SuspendedExtensions"
+                        val generatedClassName = "${className}Extensions"
 
                         if (fileBuilder == null) {
                             fileBuilder = FileSpec.builder(packageName, generatedClassName)
                                 .addImport("de.ffuf.kotlin.multiplatform.annotations", "suspendRunCatching")
+                            outputFile = File(it.descriptor.guessingProjectFolder(), "src/commonMain/kotlin")
+                            log("WRITING TO $packageName")
                         }
 
                         val returnType = if (it.func.returnType != null) {
-                            //TODO figure out a way to get package name
-                            ClassName.bestGuess(it.func.returnType!!.toString())
+                            val value = it.func.getReturnTypeImport().split(".")
+                            ClassName(value.dropLast(1).joinToString("."), value.last())
                         } else {
                             Unit::class.asTypeName()
                         }
+                        log("Return type: $returnType")
 
                         fileBuilder?.addFunction(
                             FunSpec.builder(it.func.name.identifier)
@@ -70,7 +77,7 @@ class NativeSuspendedFunctionProcessor(configuration: CompilerConfiguration) : A
                                         ClassName(
                                             param.packagee.packagename,
                                             param.packagee.classname
-                                        )
+                                        ).copy(nullable = param.nullable)
                                     ).build()
                                 })
                                 .addParameter(
@@ -99,20 +106,38 @@ class NativeSuspendedFunctionProcessor(configuration: CompilerConfiguration) : A
                         )
 
                     } else {
-                        println("SUSPEND: ${it.func.isSuspend}")
                         log("Found Function: " + it.func.name + " Module: " + it.func.module.simpleName() + " platform   " + activeTargetPlatform.first().platformName)
                     }
                 }
             }
         }
 
-        fileBuilder?.build()?.writeTo(File("example/src/commonMain/kotlin"))
     }
 
     override fun getSupportedAnnotationTypes(): Set<String> = setOf(testFunction)
 
     override fun processingOver() {
         log("$TAG***Processor over ***")
+
+        fileBuilder?.build()?.let {
+            outputFile?.let { file ->
+                val str = StringBuilder()
+                it.writeTo(str)
+                log("FILE: $file, builderzzz: ${str}")
+                try {
+                    if (!file.exists()) {
+                        file.createNewFile()
+                    }
+                    it.writeTo(file)
+                } catch (e: Exception) {
+                    log(e.toString())
+                    val errors = StringWriter()
+                    e.printStackTrace(PrintWriter(errors))
+                    log(errors.toString())
+                }
+            }
+
+        }
     }
 
 }

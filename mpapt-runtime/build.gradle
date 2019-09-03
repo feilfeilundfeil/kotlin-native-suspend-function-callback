@@ -1,0 +1,75 @@
+buildscript {
+    ext.buildMaven = { p -> repositories { maven { url p } } }
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.3.50'
+    id "maven"
+    id 'maven-publish'
+}
+
+
+apply plugin: "kotlin-kapt"
+
+allprojects {
+
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://maven.google.com" }
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+}
+
+group = "de.jensklingenberg"
+archivesBaseName = "mpapt-runtime"
+version = "0.8.1"
+
+install {
+    repositories.mavenInstaller {
+        pom.artifactId = archivesBaseName
+    }
+}
+
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri("${System.getProperty('user.home')}/.m2/repository"))
+        }
+    }
+}
+
+publishing {
+    publications {
+
+    }
+    repositories {
+        maven {
+            url = uri("${System.getProperty('user.home')}/.m2/repository")
+        }
+    }
+}
+
+
+dependencies {
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib"
+    compileOnly "org.jetbrains.kotlin:kotlin-compiler-embeddable:1.3.50"
+    compileOnly "com.google.auto.service:auto-service:1.0-rc6"
+    kapt "com.google.auto.service:auto-service:1.0-rc6"
+}
+
+
+build.finalizedBy(install)

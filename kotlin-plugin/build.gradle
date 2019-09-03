@@ -25,13 +25,13 @@ apply plugin: "kotlin-kapt"
 apply plugin: "maven"
 
 
-group = "de.jensklingenberg"
-archivesBaseName = "kotlin-compiler-plugin"
-version = "0.0.1"
+group = "de.ffuf.kotlin.multiplatform.processor"
+archivesBaseName = "nativesuspendfunction-compiler"
+version = "0.0.2"
 
 install {
     repositories.mavenInstaller {
-        pom.artifactId = 'kotlin-compiler-plugin'
+        pom.artifactId = archivesBaseName
     }
 }
 

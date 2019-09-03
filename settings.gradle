@@ -4,3 +4,6 @@ include 'example'
 include ':kotlin-compiler-native-plugin'
 include ':kotlin-plugin'
 include ':kotlin-plugin-shared'
+
+include ':mpapt-runtime'
+
