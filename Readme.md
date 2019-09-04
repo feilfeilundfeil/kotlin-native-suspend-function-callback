@@ -15,6 +15,9 @@ As suspended functions aren't visible from Kotlin Native I created this plugin t
 functions with `@NativeSuspendedFunction`. The plugin will find these methods and generate a Kotlin source code file 
 that uses callbacks that can be used from Kotlin Native.
 
+Additionally you may use `@NativeFlowFunction` to generate a wrapper around a function that returns a Flow - something that
+Kotlin Native also cannot handle right now.
+
 This plugin uses mpapt-runtime from Jens Klingenberg: https://github.com/Foso/MpApt
 
 ## Example
@@ -26,6 +29,15 @@ class CommonAnnotated {
     internal suspend fun firstFunction2(id: Datum, type: Double?): Int {
         return 0
     }
+    
+    @ExperimentalCoroutinesApi
+    @NativeFlowFunction
+    fun subscribeToMowerChanges(test: Int): Flow<CoroutineScope> {
+        return callbackFlow {
+            offer(GlobalScope)
+        }
+    }
+
 }
 ```
 Generated extension:
@@ -37,6 +49,14 @@ internal fun CommonAnnotated.firstFunction2(
 ) = mainScope.launch {
     callback(suspendRunCatching<Int> { firstFunction2(id, type) })
 }
+
+@ExperimentalCoroutinesApi
+fun CommonAnnotated.testFlowFunction(test: Int, callback: (CoroutineScope) -> Unit) =
+    GlobalScope.launch {
+        testFlowFunction(test).collect {
+            callback(it)
+        }
+    }
 ```
 The class `SuspendResult` is an implementation of https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-result/index.html
 that was made compatible with Kotlin Native (no inline functions etc.)
@@ -56,8 +76,8 @@ repositories {
 }
 
 plugins {
-   id("native-suspend-function") version "1.0.1"
-    // or as dependency: "de.ffuf.kotlin.multiplatform.processor:nativesuspendfunction:1.0.1"
+   id("native-suspend-function") version "1.0.3"
+    // or as dependency: "de.ffuf.kotlin.multiplatform.processor:nativesuspendfunction:1.0.3"
 }
 ```
 and in your `pluginManagement`:

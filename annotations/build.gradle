@@ -24,7 +24,7 @@ plugins {
 
 group = "de.ffuf.kotlin.multiplatform.annotations"
 
-version = "0.0.2"
+version = "0.0.5"
 
 
 repositories {
@@ -34,6 +34,9 @@ repositories {
 kotlin {
     jvm()
     js()
+    iosX64()
+    iosArm64()
+    iosArm32()
 
     sourceSets {
         commonMain {

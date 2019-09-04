@@ -27,7 +27,7 @@ apply plugin: "maven"
 
 group = "de.ffuf.kotlin.multiplatform.processor"
 archivesBaseName = "nativesuspendfunction-compiler"
-version = "0.0.2"
+version = "0.0.4"
 
 install {
     repositories.mavenInstaller {
@@ -41,8 +41,21 @@ repositories {
     jcenter()
 }
 
+subprojects { subProject ->
+    subProject.configurations.all { configuration ->
+        // Workaround for kapt bug with MPP dependencies
+        // https://youtrack.jetbrains.com/issue/KT-31641
+        // https://youtrack.jetbrains.com/issue/KT-33206
+        if (name.contains('kapt')) {
+            attributes.attribute(Usage.USAGE_ATTRIBUTE, subProject.objects.named(Usage.class, Usage.JAVA_RUNTIME))
+        }
+    }
+}
+
 dependencies {
-    compile project(':kotlin-plugin-shared')
+    compile 'de.jensklingenberg:mpapt-runtime:0.8.1'
+    compile "de.ffuf.kotlin.multiplatform.annotations:annotations-jvm:0.0.5"
+    compile 'com.squareup:kotlinpoet:1.3.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compileOnly "org.jetbrains.kotlin:kotlin-compiler-embeddable"
     compileOnly "com.google.auto.service:auto-service:1.0-rc6"
@@ -50,8 +63,6 @@ dependencies {
 }
 
 build{
-    dependsOn ':kotlin-plugin-shared:install'
-
     finalizedBy(install)
 }
 

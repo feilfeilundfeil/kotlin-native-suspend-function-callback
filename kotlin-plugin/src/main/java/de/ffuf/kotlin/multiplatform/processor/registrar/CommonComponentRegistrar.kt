@@ -1,14 +1,11 @@
 package de.ffuf.kotlin.multiplatform.processor.registrar
 
 import com.google.auto.service.AutoService
-import de.ffuf.kotlin.multiplatform.processor.NativeSuspendedFunctionKeys
-import de.ffuf.kotlin.multiplatform.processor.NativeSuspendedFunctionProcessor
 import de.jensklingenberg.mpapt.common.MpAptProject
 import org.jetbrains.kotlin.codegen.extensions.ClassBuilderInterceptorExtension
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.compiler.plugin.*
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.js.translate.extensions.JsSyntheticTranslateExtension
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
