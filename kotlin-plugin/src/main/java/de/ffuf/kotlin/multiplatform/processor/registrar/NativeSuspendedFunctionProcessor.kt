@@ -67,7 +67,7 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
 
         val packageName = it.descriptor.original.containingDeclaration.fqNameSafe.asString()
         val className = it.descriptor.defaultType.toString()
-        val generatedClassName = "${className}Extensions"
+        val generatedClassName = "NativeCoroutineExtensions"
 
         if (fileBuilder == null) {
             fileBuilder = FileSpec.builder(packageName, generatedClassName)
