@@ -76,8 +76,8 @@ repositories {
 }
 
 plugins {
-   id("native-suspend-function") version "1.0.3"
-    // or as dependency: "de.ffuf.kotlin.multiplatform.processor:nativesuspendfunction:1.0.3"
+   id("native-suspend-function") version "1.0.5"
+    // or as dependency: "de.ffuf.kotlin.multiplatform.processor:nativesuspendfunction:1.0.5"
 }
 ```
 and in your `pluginManagement`:

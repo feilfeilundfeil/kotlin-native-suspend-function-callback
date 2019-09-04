@@ -20,8 +20,8 @@ open class CommonComponentRegistrar : ComponentRegistrar {
         project: MockProject,
         configuration: CompilerConfiguration
     ) {
-        val processor = NativeSuspendedFunctionProcessor(configuration)
-        val mpapt = MpAptProject(processor)
+        val processor = NativeSuspendedFunctionProcessor()
+        val mpapt = MpAptProject(processor, configuration)
         StorageComponentContainerContributor.registerExtension(project, mpapt)
         SyntheticResolveExtension.registerExtension(project, mpapt)
         ClassBuilderInterceptorExtension.registerExtension(project, mpapt)

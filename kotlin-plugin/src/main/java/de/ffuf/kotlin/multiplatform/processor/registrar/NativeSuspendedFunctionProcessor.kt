@@ -34,7 +34,8 @@ object NativeSuspendedFunctionKeys {
 }
 private const val TAG = "NativeSuspendedFunctionProcessor"
 
-class NativeSuspendedFunctionProcessor(configuration: CompilerConfiguration) : AbstractProcessor(configuration) {
+
+class NativeSuspendedFunctionProcessor : AbstractProcessor() {
 
     private val nativeSuspendFunction = NativeSuspendedFunction::class.java.name
     private val nativeFlowFunction = NativeFlowFunction::class.java.name

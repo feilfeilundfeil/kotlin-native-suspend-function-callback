@@ -1,7 +1,6 @@
 package de.jensklingenberg.mpapt.common
 
 import de.jensklingenberg.mpapt.model.FunctionParameter
-import de.jensklingenberg.mpapt.model.Package
 import org.jetbrains.kotlin.backend.common.descriptors.allParameters
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -10,6 +9,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.getImportableDescriptor
 import org.jetbrains.kotlin.resolve.source.KotlinSourceElement
 import org.jetbrains.kotlin.resolve.source.getPsi
+import de.jensklingenberg.mpapt.model.Package
 
 
 /**
