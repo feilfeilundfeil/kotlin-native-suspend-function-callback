@@ -7,6 +7,7 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
         classpath 'com.github.jengelman.gradle.plugins:shadow:5.0.0'
     }
 
@@ -20,18 +21,13 @@ buildscript {
 
 apply plugin: "org.jetbrains.kotlin.jvm"
 apply plugin: "kotlin-kapt"
-apply plugin: "maven"
+apply plugin: "maven-publish"
+apply plugin: "com.jfrog.bintray"
+
 
 group = "de.ffuf.kotlin.multiplatform.processor"
 archivesBaseName = "nativesuspendfunction-compiler"
 version = "1.0.6"
-
-install {
-    dependsOn(":annotations:build")
-    repositories.mavenInstaller {
-        pom.artifactId = archivesBaseName
-    }
-}
 
 repositories {
     mavenCentral()
@@ -52,7 +48,7 @@ subprojects { subProject ->
 
 dependencies {
     compile 'de.jensklingenberg:mpapt-runtime:0.8.1'
-    compile "de.ffuf.kotlin.multiplatform.annotations:annotations-jvm:0.0.5"
+    compile "de.ffuf.kotlin.multiplatform.annotations:annotations-jvm:1.0.6"
     compile 'com.squareup:kotlinpoet:1.3.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compileOnly "org.jetbrains.kotlin:kotlin-compiler-embeddable"
@@ -60,40 +56,68 @@ dependencies {
     kapt "com.google.auto.service:auto-service:1.0-rc6"
 }
 
-build {
-    finalizedBy(install)
-}
-
 kapt {
     includeCompileClasspath = true
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: uri("${System.getProperty('user.home')}/.m2/repository"))
-            pom.project {
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
-                developers {
-                    developer {
-                        id "Jonas Bark"
-                        name "Jonas Bark"
-                        organization "FFUF"
-                        organizationUrl "http://twitter.com/boni2k"
-                    }
-                    developer {
-                        id "FFUF"
-                        name "Feil Feil & Feil GmbH"
-                        organization "FFUF"
-                        organizationUrl "http://www.ffuf.de"
-                    }
-                }
+def pomConfig = {
+    developers {
+        developer {
+            id "Jonas Bark"
+            organization "FFUF"
+            organizationUrl "http://twitter.com/boni2k"
+        }
+        developer {
+            id "FFUF"
+            organization "FFUF"
+            organizationUrl "http://www.ffuf.de"
+        }
+    }
+    scm {
+        url "https://github.com/feilfeilundfeil/kotlin-native-suspend-function-callback"
+    }
+}
+
+
+bintray {
+    user = bintray_user
+    key = bintray_api_key
+    publications = ['MyPublication']
+    pkg {
+        repo = "ffuf"
+        name = "kotlin-native-suspend-function-callback"
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/feilfeilundfeil/kotlin-native-suspend-function-callback'
+        version {
+            name = project.version
+            desc = 'Initial bintray release'
+            released = new Date()
+        }
+    }
+}
+
+bintrayUpload.dependsOn(publishToMavenLocal)
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            //artifact sourcesJar
+            artifact sourcesJar
+            groupId "de.ffuf.kotlin.multiplatform.processor"
+            artifactId "nativesuspendfunction-compiler"
+            version this.version
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'Kotlin Multiplatform compiler plugin to generate a callback implementation for suspended functions so they are visible from Kotlin Native')
+                root.appendNode('name', 'kotlin-native-suspend-function-callback')
+                root.appendNode('url', 'https://github.com/feilfeilundfeil/kotlin-native-suspend-function-callback')
+                root.children().last() + pomConfig
             }
         }
     }

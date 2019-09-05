@@ -1,5 +1,4 @@
 include 'annotations'
 include 'example'
 include ':kotlin-plugin'
-include ':mpapt-runtime'
 
