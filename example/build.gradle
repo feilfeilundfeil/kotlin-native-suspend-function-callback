@@ -11,7 +11,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "de.ffuf.kotlin.multiplatform.processor:nativesuspendfunction:1.0.5"
+        classpath "de.ffuf.kotlin.multiplatform.processor:nativesuspendfunction:1.0.6"
 
     }
 

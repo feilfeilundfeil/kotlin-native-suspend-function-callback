@@ -79,6 +79,7 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
 
         if (fileBuilder == null) {
             fileBuilder = FileSpec.builder(packageName, generatedClassName)
+                .indent("    ")
                 .addImport("de.ffuf.kotlin.multiplatform.annotations", "suspendRunCatching")
                 .addImport("kotlinx.coroutines", "launch")
                 .addImport("kotlinx.coroutines.flow", "collect")
@@ -92,6 +93,8 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
                 possibleProjectDirectory.substringBefore(outputDirectory),
                 outputDirectory
             )
+            log("Outputfile: ${outputFile?.path} Package: $packageName")
+
             val imports: String? = configuration.get(IMPORTS)
             imports?.let { imports ->
                 imports.split("&").forEach { import ->
@@ -206,6 +209,7 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
 
         fileBuilder?.build()?.let {
             outputFile?.let { file ->
+                log("$TAG***Processor over, writing to $file ***")
                 if (!file.exists()) {
                     file.mkdir()
                 }

@@ -32,7 +32,7 @@ apply plugin: "maven"
 
 group = "de.ffuf.kotlin.multiplatform.processor"
 archivesBaseName = "nativesuspendfunction"
-version = "1.0.5"
+version = "1.0.6"
 
 
 
