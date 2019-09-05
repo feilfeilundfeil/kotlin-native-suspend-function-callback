@@ -58,7 +58,7 @@ class NativeTestComponentCommandLineProcessor : CommandLineProcessor {
     }
 
     override val pluginId = PLUGIN_ID
-    override val pluginOptions = listOf(IMPORTS_OPTION, SCOPENAME_OPTION, OUTPUTDIRECTORY_OPTION)
+    override val pluginOptions = listOf(IMPORTS_OPTION, SCOPENAME_OPTION, OUTPUTDIRECTORY_OPTION, PACKAGENAME_OPTION)
 
     override fun processOption(option: AbstractCliOption, value: String, configuration: CompilerConfiguration) {
         return when (option) {

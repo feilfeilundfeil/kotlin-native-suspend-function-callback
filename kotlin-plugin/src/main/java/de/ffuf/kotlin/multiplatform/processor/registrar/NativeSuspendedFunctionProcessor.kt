@@ -34,6 +34,7 @@ object NativeSuspendedFunctionKeys {
         "output package name of generated extension - if empty it uses the package name of the first found annotation"
     )
 }
+
 private const val TAG = "NativeSuspendedFunctionProcessor"
 
 
@@ -81,10 +82,15 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
                 .addImport("de.ffuf.kotlin.multiplatform.annotations", "suspendRunCatching")
                 .addImport("kotlinx.coroutines", "launch")
                 .addImport("kotlinx.coroutines.flow", "collect")
+
+            val outputDirectory = configuration.get(
+                OUTPUTDIRECTORY, "src/commonMain/kotlin"
+            )
+            val possibleProjectDirectory = functionElement.descriptor.guessingProjectFolder()
             outputFile = File(
-                functionElement.descriptor.guessingProjectFolder(), configuration.get(
-                    OUTPUTDIRECTORY, "src/commonMain/kotlin"
-                )
+                // fix when trying to compile Android app
+                possibleProjectDirectory.substringBefore(outputDirectory),
+                outputDirectory
             )
             val imports: String? = configuration.get(IMPORTS)
             imports?.let { imports ->
@@ -96,6 +102,9 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
                 }
             }
         }
+
+        val originalPackageName = functionElement.descriptor.original.containingDeclaration.fqNameSafe.asString()
+        fileBuilder?.addImport(originalPackageName, className)
 
         val returnType: TypeName = if (functionElement.func.returnType != null) {
             val value = if (isFlow) { //kotlin.
@@ -178,7 +187,7 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
                         "${functionElement.func.name}(${functionElement.func.getFunctionParameters().joinToString(", ") { param -> param.parameterName }})"
                     if (isFlow) {
                         beginControlFlow("${originalCall}.collect")
-                        addStatement("callback(functionElement)")
+                        addStatement("callback(it)")
                         endControlFlow()
 
                     } else {
@@ -198,7 +207,7 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
         fileBuilder?.build()?.let {
             outputFile?.let { file ->
                 if (!file.exists()) {
-                    file.createNewFile()
+                    file.mkdir()
                 }
                 it.writeTo(file)
             }
