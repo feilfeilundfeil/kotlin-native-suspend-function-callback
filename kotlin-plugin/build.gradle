@@ -27,6 +27,7 @@ archivesBaseName = "nativesuspendfunction-compiler"
 version = "1.0.6"
 
 install {
+    dependsOn(":annotations:build")
     repositories.mavenInstaller {
         pom.artifactId = archivesBaseName
     }
@@ -59,7 +60,7 @@ dependencies {
     kapt "com.google.auto.service:auto-service:1.0-rc6"
 }
 
-build{
+build {
     finalizedBy(install)
 }
 
@@ -71,6 +72,29 @@ uploadArchives {
     repositories {
         mavenDeployer {
             repository(url: uri("${System.getProperty('user.home')}/.m2/repository"))
+            pom.project {
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+                developers {
+                    developer {
+                        id "Jonas Bark"
+                        name "Jonas Bark"
+                        organization "FFUF"
+                        organizationUrl "http://twitter.com/boni2k"
+                    }
+                    developer {
+                        id "FFUF"
+                        name "Feil Feil & Feil GmbH"
+                        organization "FFUF"
+                        organizationUrl "http://www.ffuf.de"
+                    }
+                }
+            }
         }
     }
 }

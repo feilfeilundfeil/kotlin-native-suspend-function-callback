@@ -72,7 +72,7 @@ Inside your projects build.gradle(.kts) add the following plugin:
 
 ```kotlin
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 plugins {
