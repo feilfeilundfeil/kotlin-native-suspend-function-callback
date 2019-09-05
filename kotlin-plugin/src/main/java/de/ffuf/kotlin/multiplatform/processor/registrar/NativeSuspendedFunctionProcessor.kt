@@ -7,20 +7,18 @@ import de.ffuf.kotlin.multiplatform.annotations.NativeSuspendedFunction
 import de.ffuf.kotlin.multiplatform.annotations.SuspendResult
 import de.ffuf.kotlin.multiplatform.processor.registrar.NativeSuspendedFunctionKeys.IMPORTS
 import de.ffuf.kotlin.multiplatform.processor.registrar.NativeSuspendedFunctionKeys.OUTPUTDIRECTORY
+import de.ffuf.kotlin.multiplatform.processor.registrar.NativeSuspendedFunctionKeys.PACKAGENAME
 import de.ffuf.kotlin.multiplatform.processor.registrar.NativeSuspendedFunctionKeys.SCOPENAME
 import de.jensklingenberg.mpapt.common.*
 import de.jensklingenberg.mpapt.model.AbstractProcessor
 import de.jensklingenberg.mpapt.model.Element
 import de.jensklingenberg.mpapt.model.RoundEnvironment
-import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.descriptors.EffectiveVisibility
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import java.io.File
-import kotlin.reflect.KClass
 
 object NativeSuspendedFunctionKeys {
     val IMPORTS: CompilerConfigurationKey<String> =
@@ -29,7 +27,11 @@ object NativeSuspendedFunctionKeys {
     val SCOPENAME: CompilerConfigurationKey<String> = CompilerConfigurationKey.create("scope name to use")
 
     val OUTPUTDIRECTORY: CompilerConfigurationKey<String> = CompilerConfigurationKey.create(
-        "output directory of generated classes (excluding package name)"
+        "output directory of generated extension class (excluding package name)"
+    )
+
+    val PACKAGENAME: CompilerConfigurationKey<String> = CompilerConfigurationKey.create(
+        "output package name of generated extension - if empty it uses the package name of the first found annotation"
     )
 }
 private const val TAG = "NativeSuspendedFunctionProcessor"
@@ -40,8 +42,8 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
     private val nativeSuspendFunction = NativeSuspendedFunction::class.java.name
     private val nativeFlowFunction = NativeFlowFunction::class.java.name
 
-    var fileBuilder: FileSpec.Builder? = null
-    var outputFile: File? = null
+    private var fileBuilder: FileSpec.Builder? = null
+    private var outputFile: File? = null
 
     override fun process(roundEnvironment: RoundEnvironment) {
         roundEnvironment.getElementsAnnotatedWith(NativeSuspendedFunction::class.java.name).forEach {
@@ -62,11 +64,16 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
         }
     }
 
-    private fun generateFunction(it: Element.FunctionElement, isFlow: Boolean) {
-        log("Found suspended Function: " + it.func.name + " Module: " + it.func.module.simpleName() + " platform " + activeTargetPlatform.first().platformName)
+    private fun generateFunction(functionElement: Element.FunctionElement, isFlow: Boolean) {
+        log("Found suspended Function: " + functionElement.func.name + " Module: " + functionElement.func.module.simpleName() + " platform " + activeTargetPlatform.first().platformName)
 
-        val packageName = it.descriptor.original.containingDeclaration.fqNameSafe.asString()
-        val className = it.descriptor.defaultType.toString()
+        val packageName = configuration.get(
+            PACKAGENAME, ""
+        ).let {
+            if (it.isEmpty()) functionElement.descriptor.original.containingDeclaration.fqNameSafe.asString() else it
+        }
+
+        val className = functionElement.descriptor.defaultType.toString()
         val generatedClassName = "NativeCoroutineExtensions"
 
         if (fileBuilder == null) {
@@ -75,7 +82,7 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
                 .addImport("kotlinx.coroutines", "launch")
                 .addImport("kotlinx.coroutines.flow", "collect")
             outputFile = File(
-                it.descriptor.guessingProjectFolder(), configuration.get(
+                functionElement.descriptor.guessingProjectFolder(), configuration.get(
                     OUTPUTDIRECTORY, "src/commonMain/kotlin"
                 )
             )
@@ -90,11 +97,11 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
             }
         }
 
-        val returnType: TypeName = if (it.func.returnType != null) {
+        val returnType: TypeName = if (functionElement.func.returnType != null) {
             val value = if (isFlow) { //kotlin.
-                it.func.getReturnTypeImport().substringAfter("<").substringBefore(">").split(".")
+                functionElement.func.getReturnTypeImport().substringAfter("<").substringBefore(">").split(".")
             } else {
-                it.func.getReturnTypeImport().split(".")
+                functionElement.func.getReturnTypeImport().split(".")
             }
             ClassName(value.dropLast(1).joinToString("."), value.last())
         } else {
@@ -102,9 +109,9 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
         }
 
         fileBuilder?.addFunction(
-            FunSpec.builder(it.func.name.identifier)
+            FunSpec.builder(functionElement.func.name.identifier)
                 .receiver(ClassName(packageName, className))
-                .addAnnotations(it.func.annotations.filterNot { it.type.toString() == NativeSuspendedFunction::class.java.simpleName || it.type.toString() == NativeFlowFunction::class.java.simpleName }.map { annotation ->
+                .addAnnotations(functionElement.func.annotations.filterNot { it.type.toString() == NativeSuspendedFunction::class.java.simpleName || it.type.toString() == NativeFlowFunction::class.java.simpleName }.map { annotation ->
                     AnnotationSpec.builder(
                         ClassName(
                             annotation.annotationClass?.original?.containingDeclaration?.fqNameSafe?.asString()
@@ -114,11 +121,11 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
                     ).build()
                 })
                 .apply {
-                    if (it.func.visibility == EffectiveVisibility.Internal.toVisibility()) {
+                    if (functionElement.func.visibility == EffectiveVisibility.Internal.toVisibility()) {
                         addModifiers(KModifier.INTERNAL)
                     }
                 }
-                .addParameters(it.func.getFunctionParameters().map { param ->
+                .addParameters(functionElement.func.getFunctionParameters().map { param ->
                     ParameterSpec.builder(
                         param.parameterName,
                         ClassName(
@@ -158,7 +165,7 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
 
     fun subscribeToMowerChanges(test: Int, callback: (String) -> Unit): Job = GlobalScope.launch {
         subscribeToMowerChanges(test).collect {
-            callback(it)
+            callback(functionElement)
         }
     }
                      */
@@ -168,10 +175,10 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
                     )
                     beginControlFlow("return $scopeName.launch {")
                     val originalCall =
-                        "${it.func.name}(${it.func.getFunctionParameters().joinToString(", ") { param -> param.parameterName }})"
+                        "${functionElement.func.name}(${functionElement.func.getFunctionParameters().joinToString(", ") { param -> param.parameterName }})"
                     if (isFlow) {
                         beginControlFlow("${originalCall}.collect")
-                        addStatement("callback(it)")
+                        addStatement("callback(functionElement)")
                         endControlFlow()
 
                     } else {

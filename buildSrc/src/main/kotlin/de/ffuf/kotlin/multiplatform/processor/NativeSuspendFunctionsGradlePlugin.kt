@@ -5,10 +5,11 @@ import org.gradle.api.Project
 open class NativeSuspendFunctionsExtension {
     var scopeName = "mainScope"
     var outputDirectory = "src/commonMain/kotlin"
+    var packageName: String = ""
     var imports: List<String> = emptyList()
 
     override fun toString(): String {
-        return "NativeSuspendFunctionsExtension(scopeName='$scopeName', ouputDirectory='$outputDirectory', imports=$imports)"
+        return "NativeSuspendFunctionsExtension(scopeName='$scopeName', outputDirectory='$outputDirectory', packageName=$packageName, imports=$imports)"
     }
 }
 

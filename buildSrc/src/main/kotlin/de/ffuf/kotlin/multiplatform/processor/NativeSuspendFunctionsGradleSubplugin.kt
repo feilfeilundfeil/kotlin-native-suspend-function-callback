@@ -25,7 +25,8 @@ class NativeSuspendFunctionsGradleSubplugin : KotlinGradleSubplugin<AbstractComp
         return listOf(
             SubpluginOption(NativeSuspendFunctionsExtension::scopeName.name, extension.scopeName),
             SubpluginOption(NativeSuspendFunctionsExtension::outputDirectory.name, extension.outputDirectory),
-            SubpluginOption(NativeSuspendFunctionsExtension::imports.name, extension.imports.joinToString("&"))
+            SubpluginOption(NativeSuspendFunctionsExtension::imports.name, extension.imports.joinToString("&")),
+            SubpluginOption(NativeSuspendFunctionsExtension::packageName.name, extension.packageName)
         )
     }
 

@@ -99,9 +99,10 @@ pluginManagement {
 The compiler plugin unfortunately won't be able to resolve all needed imports but you may add them in the configuration:
 ```kotlin
 nativeSuspendExtension {
-    outputDirectory = "src/commonMain/kotlin" // this is the default output directory for the generated files (without package)
+    outputDirectory = "src/commonMain/kotlin" // this is the default output directory for the generated extension file (without package)
     scopeName = "mainScope" // in our case we use a CoroutineScope called "mainScope" - don#t forget to import that location 
     imports = listOf("test.import.package") // additional imports for the generated file
+    packageName = "de.ffuf.kotlin.extensions" //allows configuring the package name of the generated file
 }
 ```
 

@@ -48,6 +48,11 @@ class NativeTestComponentCommandLineProcessor : CommandLineProcessor {
             NativeSuspendedFunctionKeys.OUTPUTDIRECTORY.toString(),
             required = false, allowMultipleOccurrences = false
         )
+        val PACKAGENAME_OPTION = CliOption(
+            "packageName", "<name>",
+            NativeSuspendedFunctionKeys.PACKAGENAME.toString(),
+            required = false, allowMultipleOccurrences = false
+        )
 
         val PLUGIN_ID = "native-suspend-function"
     }
@@ -60,6 +65,7 @@ class NativeTestComponentCommandLineProcessor : CommandLineProcessor {
             IMPORTS_OPTION -> configuration.put(NativeSuspendedFunctionKeys.IMPORTS, value)
             SCOPENAME_OPTION -> configuration.put(NativeSuspendedFunctionKeys.SCOPENAME, value)
             OUTPUTDIRECTORY_OPTION -> configuration.put(NativeSuspendedFunctionKeys.OUTPUTDIRECTORY, value)
+            PACKAGENAME_OPTION -> configuration.put(NativeSuspendedFunctionKeys.PACKAGENAME, value)
             else -> throw CliOptionProcessingException("Unknown option: ${option.optionName}")
         }
     }
