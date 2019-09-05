@@ -8,7 +8,7 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
-        classpath 'com.github.jengelman.gradle.plugins:shadow:5.0.0'
+        //classpath 'com.github.jengelman.gradle.plugins:shadow:5.0.0'
     }
 
     allprojects {
@@ -23,11 +23,13 @@ apply plugin: "org.jetbrains.kotlin.jvm"
 apply plugin: "kotlin-kapt"
 apply plugin: "maven-publish"
 apply plugin: "com.jfrog.bintray"
+apply plugin: "java"
+//apply plugin: 'com.github.johnrengelman.shadow'
 
 
 group = "de.ffuf.kotlin.multiplatform.processor"
 archivesBaseName = "nativesuspendfunction-compiler"
-version = "1.0.6"
+version = "1.0.8"
 
 repositories {
     mavenCentral()
@@ -78,37 +80,22 @@ def pomConfig = {
     }
 }
 
-
-bintray {
-    user = bintray_user
-    key = bintray_api_key
-    publications = ['MyPublication']
-    pkg {
-        repo = "ffuf"
-        name = "kotlin-native-suspend-function-callback"
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/feilfeilundfeil/kotlin-native-suspend-function-callback'
-        version {
-            name = project.version
-            desc = 'Initial bintray release'
-            released = new Date()
-        }
-    }
-}
-
-bintrayUpload.dependsOn(publishToMavenLocal)
-
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
+artifacts {
+    archives sourcesJar
+}
+
 publishing {
     publications {
-        MyPublication(MavenPublication) {
+        mavenPublication(MavenPublication) {
             from components.java
-            //artifact sourcesJar
-            artifact sourcesJar
+            artifact sourcesJar {
+                classifier "sources"
+            }
             groupId "de.ffuf.kotlin.multiplatform.processor"
             artifactId "nativesuspendfunction-compiler"
             version this.version
@@ -122,3 +109,23 @@ publishing {
         }
     }
 }
+
+bintray {
+    user = bintray_user
+    key = bintray_api_key
+    publications = ['mavenPublication']
+    pkg {
+        repo = "ffuf"
+        name = "kotlin-native-suspend-function-callback"
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/feilfeilundfeil/kotlin-native-suspend-function-callback'
+        version {
+            name = project.version
+            desc = project.version
+            released = new Date()
+        }
+
+    }
+}
+
+bintrayUpload.dependsOn(publishToMavenLocal)

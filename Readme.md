@@ -76,7 +76,7 @@ repositories {
 }
 
 plugins {
-   id("native-suspend-function") version "1.0.6"
+   id("native-suspend-function") version "1.0.8"
     // or as dependency: "de.ffuf.kotlin.multiplatform.processor:nativesuspendfunction:1.0.6"
 }
 

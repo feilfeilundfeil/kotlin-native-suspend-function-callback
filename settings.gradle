@@ -1,4 +1,4 @@
 include 'annotations'
-include 'example'
-include ':kotlin-plugin'
+//include 'example'
+//include ':kotlin-plugin'
 

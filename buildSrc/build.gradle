@@ -31,10 +31,8 @@ apply plugin: "maven"
 
 
 group = "de.ffuf.kotlin.multiplatform.processor"
-archivesBaseName = "nativesuspendfunction"
-version = "1.0.6"
-
-
+archivesBaseName = "nativesuspendfunction-compiler"
+version = "1.0.8"
 
 install {
     repositories.mavenInstaller {
