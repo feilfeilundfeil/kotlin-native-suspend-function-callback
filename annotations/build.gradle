@@ -23,7 +23,7 @@ plugins {
 apply plugin: 'com.jfrog.bintray'
 
 group = "de.ffuf.kotlin.multiplatform.annotations"
-version = "1.0.8"
+version = plugin_version
 
 repositories {
 
@@ -107,6 +107,95 @@ def pomConfig = {
     }
 }
 
+
+task emptyJar(type: Jar) {
+}
+
+task emptySourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets
+}
+
+task stubJavadoc(type: Jar) {
+    classifier 'javadoc'
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets
+}
+
+project.ext.configureMavenCentralMetadata = { pom ->
+    def root = asNode()
+    root.appendNode('name', "kotlin-native-suspend-function-callback-annotations")
+    root.appendNode('description', 'Annotations for kotlin-native-suspend-function-callback')
+    root.appendNode('url', 'https://ffuf.de')
+    root.children().last() + pomConfig
+
+    def dependenciesNode = asNode().getAt("dependencies")[0]
+    if (dependenciesNode != null) {
+        def dependencyNode = dependenciesNode.appendNode('dependency')
+        dependencyNode.appendNode('groupId', "$group")
+        dependencyNode.appendNode('artifactId', "$project.name")
+        dependencyNode.appendNode('version', "$project.version")
+    }
+}
+
+def selectArtifactId(project, type, defaultName) {
+    def name = project.name
+
+    switch (type) {
+        case 'metadata':
+            return "$name"
+            break
+        case 'kotlinMultiplatform':
+            return "$name-native"
+            break
+        case 'jvm':
+            return "$name-jvm"
+            break
+        default:
+            return defaultName// : "$name"
+            break
+    }
+}
+
+publishing {
+    publications.all {
+        pom.withXml(configureMavenCentralMetadata)
+
+        def type = it.name
+        def id = selectArtifactId(project, type, it.artifactId)
+        it.artifactId = id
+        if (id.endsWith('native')) {
+            it.artifact stubJavadoc
+            it.artifact emptySourceJar
+            it.artifact emptyJar
+        }
+    }
+
+    kotlin.targets.all { target ->
+        def publication = publishing.publications.findByName(target.name)
+
+        if (publication != null) {
+            publication.artifact stubJavadoc
+
+            if (target.platformType.name != 'native') {
+                publication.moduleDescriptorGenerator = null
+            } else {
+                publication.artifact emptyJar
+            }
+        }
+    }
+
+    // Disable gradle metadata in root jvm modules
+    def hasNative = project.ext.has("hasNative") && project.ext.hasNative
+    if (!hasNative) {
+        def rootPublication = publishing.publications.findByName('kotlinMultiplatform')
+        rootPublication.moduleDescriptorGenerator = null
+    }
+}
+
 bintray {
     user = bintray_user
     key = bintray_api_key
@@ -114,6 +203,7 @@ bintray {
         repo = "ffuf"
         name = "kotlin-native-suspend-function-callback-annotations"
         licenses = ['Apache-2.0']
+        websiteUrl = "https://ffuf.de"
         vcsUrl = 'https://github.com/feilfeilundfeil/kotlin-native-suspend-function-callback'
         version {
             name = project.version
