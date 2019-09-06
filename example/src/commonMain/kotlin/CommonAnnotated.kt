@@ -14,6 +14,7 @@ class CommonAnnotated {
 
     @NativeSuspendedFunction
     @PublishedApi
+    @Deprecated("Test")
     internal suspend fun firstFunction2(id: Datum, type: Double?): Int {
         return 0
     }

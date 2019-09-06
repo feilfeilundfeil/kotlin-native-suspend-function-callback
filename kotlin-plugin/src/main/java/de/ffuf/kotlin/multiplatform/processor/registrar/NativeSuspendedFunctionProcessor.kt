@@ -130,7 +130,8 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
                                 ?: "",
                             annotation.type.toString()
                         )
-                    ).build()
+                    ).addMember(annotation.allValueArguments.map { "${it.key} = ${it.value}" }.joinToString(", "))
+                        .build()
                 })
                 .apply {
                     if (functionElement.func.visibility == EffectiveVisibility.Internal.toVisibility()) {

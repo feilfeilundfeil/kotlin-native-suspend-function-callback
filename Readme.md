@@ -63,6 +63,7 @@ that was made compatible with Kotlin Native (no inline functions etc.)
 Currently the plugin only supports:
 - copying over annotations
 - parameters + their nullability (no default values)
+
 Please check other limitations on https://github.com/Foso/MpApt
 
 Feel free to open tickets for new features.
@@ -71,7 +72,7 @@ Feel free to open tickets for new features.
 
 Inside your projects build.gradle(.kts) add the following plugin: 
 
-```kotlin
+```groovy
 repositories {
     maven { url 'https://dl.bintray.com/jonasbark/ffuf' } // should be up on jcenter soon
 }
