@@ -4,13 +4,12 @@
 [![License](https://img.shields.io/badge/Apache-2.0-green.svg)](https://github.com/Foso/MpApt/blob/master/LICENSE)
 [ ![Download](https://api.bintray.com/packages/jonasbark/ffuf/nativesuspendfunction-compiler/images/download.svg) ](https://bintray.com/jonasbark/ffuf/nativesuspendfunction-compiler/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-range.svg?style=flat-square)](#contributors)
   <a href="https://twitter.com/intent/tweet?text=Hey, check out Native Suspended Functions https://github.com/feilfeilundfeil/kotlin-native-suspend-function-callback via @boni2k #Kotlin 
 "><img src="https://img.shields.io/twitter/url/https/github.com/angular-medellin/meetup.svg?style=social" alt="Tweet"></a>
 
 
 
-## Introduction 🙋‍♂️ 🙋‍
+## Introduction
 As suspended functions aren't visible from Kotlin Native I created this plugin that adds support for annotating existing
 functions with `@NativeSuspendedFunction`. The plugin will find these methods and generate a Kotlin source code file 
 that uses callbacks that can be used from Kotlin Native.
@@ -62,9 +61,11 @@ The class `SuspendResult` is an implementation of https://kotlinlang.org/api/lat
 that was made compatible with Kotlin Native (no inline functions etc.)
 
 Currently the plugin only supports:
-[] copying over annotations
-[] parameters + their nullability (no default values)
+- copying over annotations
+- parameters + their nullability (no default values)
 Please check other limitations on https://github.com/Foso/MpApt
+
+Feel free to open tickets for new features.
 
 ## Usage
 
@@ -117,12 +118,12 @@ nativeSuspendExtension {
 }
 ```
 
-## RELEASE 
+## Release notes 
 For unknown reasons, uploading the kotlin-plugin doesn't upload the buildSrc package as well.
 So, publish it to mavenLocal first, then manually upload those files to:
 `/de/ffuf/kotlin/multiplatform/processor/nativesuspendfunction/1.0.**` 
 
-## 📜 License
+## License
 
 This project is licensed under the Apache License, Version 2.0 - see the [LICENSE.md](https://github.com/feilfeilundfeil/kotlin-native-suspend-function-callback/blob/master/LICENSE) file for details
 
