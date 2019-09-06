@@ -72,7 +72,7 @@ Inside your projects build.gradle(.kts) add the following plugin:
 
 ```kotlin
 repositories {
-    mavenCentral()
+    maven { url 'https://dl.bintray.com/jonasbark/ffuf' } // should be up on jcenter soon
 }
 
 plugins {
@@ -90,6 +90,10 @@ dependencies {
 and in your `pluginManagement`:
 ```kotlin
 pluginManagement {
+    repositories {
+        // ....
+        maven { url 'https://dl.bintray.com/jonasbark/ffuf' } // should be up on jcenter soon
+    }
     // ....
     resolutionStrategy {
         eachPlugin {
