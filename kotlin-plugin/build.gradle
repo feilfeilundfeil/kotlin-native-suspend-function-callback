@@ -8,6 +8,7 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.github.jengelman.gradle.plugins:shadow:5.0.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
     }
 
     allprojects {
@@ -21,10 +22,12 @@ buildscript {
 apply plugin: "org.jetbrains.kotlin.jvm"
 apply plugin: "kotlin-kapt"
 apply plugin: "maven"
+apply plugin: "com.jfrog.bintray"
+apply plugin: 'com.github.johnrengelman.shadow'
 
 group = "de.ffuf.kotlin.multiplatform.processor"
 archivesBaseName = "nativesuspendfunction-compiler"
-version = "1.0.6"
+version = plugin_version
 
 install {
     repositories.mavenInstaller {
@@ -50,8 +53,8 @@ subprojects { subProject ->
 }
 
 dependencies {
-    compile 'de.jensklingenberg:mpapt-runtime:0.8.1'
-    compile "de.ffuf.kotlin.multiplatform.annotations:annotations-jvm:0.0.5"
+    compile 'de.jensklingenberg:mpapt-runtime:0.8.2'
+    compile "de.ffuf.kotlin.multiplatform.annotations:annotations-jvm:1.0.12"
     compile 'com.squareup:kotlinpoet:1.3.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compileOnly "org.jetbrains.kotlin:kotlin-compiler-embeddable"
@@ -59,7 +62,67 @@ dependencies {
     kapt "com.google.auto.service:auto-service:1.0-rc6"
 }
 
-build{
+def pomConfig = {
+    developers {
+        developer {
+            id "Jonas Bark"
+            organization "FFUF"
+            organizationUrl "http://twitter.com/boni2k"
+        }
+        developer {
+            id "FFUF"
+            organization "FFUF"
+            organizationUrl "http://www.ffuf.de"
+        }
+    }
+    scm {
+        url "https://github.com/feilfeilundfeil/kotlin-native-suspend-function-callback"
+    }
+}
+
+project.ext.configureMavenCentralMetadata = { pom ->
+    def root = asNode()
+    root.appendNode('name', "kotlin-native-suspend-function-callback")
+    root.appendNode('description', 'Kotlin Multiplatform compiler plugin to generate a callback implementation for suspended functions so they are visible from Kotlin Native')
+    root.appendNode('url', 'https://ffuf.de')
+    root.children().last() + pomConfig
+
+    root.remove(root.get("dependencies")) // remove dependencies as we have a fat jar
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+    archives shadowJar
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',
+                'Implementation-Version': version,
+                'Main-Class': 'de.ffuf.kotlin.multiplatform.processor.registrar.CommonComponentRegistrar'
+    }
+    baseName = "nativesuspendfunction-compiler"
+    version = this.version
+
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+shadowJar {
+    manifest {
+        inheritFrom project.tasks.fatJar.manifest
+    }
+    baseName = "nativesuspendfunction-compiler"
+    version = this.version
+    classifier = null
+}
+
+build {
     finalizedBy(install)
 }
 
@@ -70,7 +133,18 @@ kapt {
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: uri("${System.getProperty('user.home')}/.m2/repository"))
+            //repository(url: uri("${System.getProperty('user.home')}/.m2/repository"))
+
+            pom.withXml(configureMavenCentralMetadata)
+            repository (
+                    url: 'https://api.bintray.com/maven/jonasbark/ffuf/nativesuspendfunction-compiler'
+            ) {
+                authentication(
+                        userName: bintray_user,
+                        password: bintray_api_key
+                )
+            }
         }
+
     }
 }

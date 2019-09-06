@@ -2,7 +2,7 @@
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-1.3.50-green.svg)](https://github.com/Foso/MpApt/blob/master/LICENSE)
 [![License](https://img.shields.io/badge/Apache-2.0-green.svg)](https://github.com/Foso/MpApt/blob/master/LICENSE)
-[![Jitpack](https://jitpack.io/v/feilfeilundfeil/kotlin-native-suspend-function-callback.svg)](https://jitpack.io/#feilfeilundfeil/kotlin-native-suspend-function-callback)
+[ ![Download](https://api.bintray.com/packages/jonasbark/ffuf/nativesuspendfunction-compiler/images/download.svg) ](https://bintray.com/jonasbark/ffuf/nativesuspendfunction-compiler/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-range.svg?style=flat-square)](#contributors)
   <a href="https://twitter.com/intent/tweet?text=Hey, check out Native Suspended Functions https://github.com/feilfeilundfeil/kotlin-native-suspend-function-callback via @boni2k #Kotlin 
@@ -76,9 +76,16 @@ repositories {
 }
 
 plugins {
-   id("native-suspend-function") version "1.0.6"
-    // or as dependency: "de.ffuf.kotlin.multiplatform.processor:nativesuspendfunction:1.0.6"
+   id("native-suspend-function") version "1.0.14"
+    // or as dependency: "de.ffuf.kotlin.multiplatform.processor:nativesuspendfunction:1.0.14"
 }
+
+// also add the annotations as dependency:
+dependencies {
+    // multiplatform binaries are ready - please have a look at the example project
+    implementation("de.ffuf.kotlin.multiplatform.annotations:annotations-jvm:1.0.14")
+}
+
 ```
 and in your `pluginManagement`:
 ```kotlin
@@ -105,6 +112,11 @@ nativeSuspendExtension {
     packageName = "de.ffuf.kotlin.extensions" //allows configuring the package name of the generated file
 }
 ```
+
+## RELEASE 
+For unknown reasons, uploading the kotlin-plugin doesn't upload the buildSrc package as well.
+So, publish it to mavenLocal first, then manually upload those files to:
+`/de/ffuf/kotlin/multiplatform/processor/nativesuspendfunction/1.0.**` 
 
 ## 📜 License
 

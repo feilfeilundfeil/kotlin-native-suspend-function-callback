@@ -42,6 +42,6 @@ class NativeSuspendFunctionsGradleSubplugin : KotlinGradleSubplugin<AbstractComp
     override fun getPluginArtifact(): SubpluginArtifact = SubpluginArtifact(
         groupId = "de.ffuf.kotlin.multiplatform.processor",
         artifactId = "nativesuspendfunction-compiler",
-        version = "1.0.6" // remember to bump this version before any release!
+        version = "1.0.14" // remember to bump this version before any release!
     )
 }

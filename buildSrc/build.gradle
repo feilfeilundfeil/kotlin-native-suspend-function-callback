@@ -32,8 +32,7 @@ apply plugin: "maven"
 
 group = "de.ffuf.kotlin.multiplatform.processor"
 archivesBaseName = "nativesuspendfunction"
-version = "1.0.6"
-
+version = "1.0.14"
 
 
 install {
@@ -61,4 +60,32 @@ dependencies {
 
 build {
     dependsOn install
+}
+
+
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            //repository(url: uri("${System.getProperty('user.home')}/.m2/repository"))
+            repository (
+                    url: 'https://api.bintray.com/maven/jonasbark/ffuf/nativesuspendfunction-compiler'
+            ) {
+                authentication(
+                        userName: bintray_user,
+                        password: bintray_api_key
+                )
+            }
+        }
+
+    }
 }
