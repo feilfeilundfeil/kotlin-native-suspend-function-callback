@@ -186,7 +186,7 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
                     val scopeName = configuration.get(
                         SCOPENAME, "mainScope"
                     )
-                    beginControlFlow("return $scopeName.launch {")
+                    beginControlFlow("return $scopeName.launch")
                     val originalCall =
                         "${functionElement.func.name}(${functionElement.func.getFunctionParameters().joinToString(", ") { param -> param.parameterName }})"
                     if (isFlow) {
