@@ -31,12 +31,98 @@ repositories {
     mavenCentral()
 }
 
+
+task emptyJar(type: Jar) {
+}
+
+task emptySourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets
+}
+
+task stubJavadoc(type: Jar) {
+    classifier 'javadoc'
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets
+}
+
+
+def pomConfig = {
+    licenses {
+        license {
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
+        }
+    }
+    developers {
+        developer {
+            id "Jonas Bark"
+            name "Jonas Bark"
+            organization "FFUF"
+            organizationUrl "http://twitter.com/boni2k"
+        }
+        developer {
+            id "FFUF"
+            name "Feil Feil & Feil GmbH"
+            organization "FFUF"
+            organizationUrl "http://www.ffuf.de"
+        }
+    }
+    scm {
+        url "https://github.com/feilfeilundfeil/kotlin-native-suspend-function-callback"
+    }
+}
+
+
+
+project.ext.configureMavenCentralMetadata = { pom ->
+    def root = asNode()
+    root.appendNode('name', "kotlin-native-suspend-function-callback-annotations")
+    root.appendNode('description', 'Annotations for kotlin-native-suspend-function-callback')
+    root.appendNode('url', 'https://ffuf.de')
+    root.children().last() + pomConfig
+
+    def dependenciesNode = asNode().getAt("dependencies")[0]
+    if (dependenciesNode != null) {
+        def dependencyNode = dependenciesNode.appendNode('dependency')
+        dependencyNode.appendNode('groupId', "$group")
+        dependencyNode.appendNode('artifactId', "$project.name")
+        dependencyNode.appendNode('version', "$project.version")
+    }
+}
+
 kotlin {
-    jvm()
+    jvm {
+        mavenPublication {
+            pom.withXml(configureMavenCentralMetadata)
+            //artifact(sourcesJar)
+        }
+    }
     js()
-    iosX64()
-    iosArm64()
-    iosArm32()
+    iosX64 {
+        mavenPublication {
+            pom.withXml(configureMavenCentralMetadata)
+            artifact(emptyJar)
+            //artifact(sourcesJar)
+        }
+    }
+    iosArm64 {
+        mavenPublication {
+            pom.withXml(configureMavenCentralMetadata)
+            artifact(emptyJar)
+        }
+    }
+    iosArm32 {
+        mavenPublication {
+            pom.withXml(configureMavenCentralMetadata)
+            artifact(emptyJar)
+            //artifact(sourcesJar)
+        }
+    }
 
     sourceSets {
         commonMain {
@@ -75,73 +161,41 @@ kotlin {
             }
         }
 
+        iosX64Main {
+            dependencies {
+
+            }
+        }
+
+        iosArm64Main {
+            dependencies {
+
+            }
+        }
+
     }
 }
 
 build.finalizedBy(publishToMavenLocal)
-
-def pomConfig = {
-    licenses {
-        license {
-            name 'The Apache Software License, Version 2.0'
-            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-            distribution 'repo'
+publishing {
+    /*publications {
+        kotlinMultiplatform {
+            artifactId = "annotations"
+            artifact(emptyJar)
+        }
+    }*/
+    repositories {
+        maven {
+            url 'https://api.bintray.com/maven/jonasbark/ffuf/nativesuspendfunction-compiler'
+            credentials {
+                username = bintray_user
+                password = bintray_api_key
+            }
         }
     }
-    developers {
-        developer {
-            id "Jonas Bark"
-            name "Jonas Bark"
-            organization "FFUF"
-            organizationUrl "http://twitter.com/boni2k"
-        }
-        developer {
-            id "FFUF"
-            name "Feil Feil & Feil GmbH"
-            organization "FFUF"
-            organizationUrl "http://www.ffuf.de"
-        }
-    }
-    scm {
-        url "https://github.com/feilfeilundfeil/kotlin-native-suspend-function-callback"
-    }
 }
 
-
-task emptyJar(type: Jar) {
-}
-
-task emptySourceJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets
-}
-
-task stubJavadoc(type: Jar) {
-    classifier 'javadoc'
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets
-}
-
-project.ext.configureMavenCentralMetadata = { pom ->
-    def root = asNode()
-    root.appendNode('name', "kotlin-native-suspend-function-callback-annotations")
-    root.appendNode('description', 'Annotations for kotlin-native-suspend-function-callback')
-    root.appendNode('url', 'https://ffuf.de')
-    root.children().last() + pomConfig
-
-    def dependenciesNode = asNode().getAt("dependencies")[0]
-    if (dependenciesNode != null) {
-        def dependencyNode = dependenciesNode.appendNode('dependency')
-        dependencyNode.appendNode('groupId', "$group")
-        dependencyNode.appendNode('artifactId', "$project.name")
-        dependencyNode.appendNode('version', "$project.version")
-    }
-}
-
-def selectArtifactId(project, type, defaultName) {
+/*def selectArtifactId(project, type, defaultName) {
     def name = project.name
 
     switch (type) {
@@ -194,9 +248,9 @@ publishing {
         def rootPublication = publishing.publications.findByName('kotlinMultiplatform')
         rootPublication.moduleDescriptorGenerator = null
     }
-}
+}*/
 
-bintray {
+/*bintray {
     user = bintray_user
     key = bintray_api_key
     pkg {
@@ -223,5 +277,5 @@ bintrayUpload.doFirst {
         }
         publications += publication.name
     }
-}
+}*/
 bintrayUpload.dependsOn(publishToMavenLocal)

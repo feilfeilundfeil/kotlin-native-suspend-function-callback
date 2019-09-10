@@ -1,4 +1,6 @@
+enableFeaturePreview("GRADLE_METADATA")
+
 include 'annotations'
-include 'example'
+//include 'example'
 include ':kotlin-plugin'
 include ':mpapt-runtime'
