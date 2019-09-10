@@ -85,7 +85,7 @@ plugins {
 // also add the annotations as dependency:
 dependencies {
     // multiplatform binaries are ready - please have a look at the example project
-    implementation("de.ffuf.kotlin.multiplatform.annotations:annotations-jvm:1.0.15")
+    implementation("de.ffuf.kotlin.multiplatform.annotations:annotations:1.0.17")
 }
 
 ```

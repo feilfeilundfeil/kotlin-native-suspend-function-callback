@@ -178,15 +178,15 @@ kotlin {
 
 build.finalizedBy(publishToMavenLocal)
 publishing {
-    /*publications {
+    publications {
         kotlinMultiplatform {
             artifactId = "annotations"
             artifact(emptyJar)
         }
-    }*/
+    }
     repositories {
         maven {
-            url 'https://api.bintray.com/maven/jonasbark/ffuf/nativesuspendfunction-compiler'
+            url 'https://api.bintray.com/maven/jonasbark/ffuf/kotlin-native-suspend-function-callback-annotations'
             credentials {
                 username = bintray_user
                 password = bintray_api_key
