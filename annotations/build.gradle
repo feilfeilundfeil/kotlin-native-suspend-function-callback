@@ -186,6 +186,7 @@ publishing {
     }
     repositories {
         maven {
+            //url "${System.getProperty('user.home')}/.m2/repository"
             url 'https://api.bintray.com/maven/jonasbark/ffuf/kotlin-native-suspend-function-callback-annotations'
             credentials {
                 username = bintray_user

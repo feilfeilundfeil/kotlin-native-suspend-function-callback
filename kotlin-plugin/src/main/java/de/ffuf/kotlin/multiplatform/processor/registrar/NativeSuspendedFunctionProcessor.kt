@@ -144,7 +144,14 @@ class NativeSuspendedFunctionProcessor : AbstractProcessor() {
                         ClassName(
                             param.packagee.packagename,
                             param.packagee.classname
-                        ).copy(nullable = param.nullable)
+                        ).let {
+                            if (param.genericPackage != null) {
+                                ClassName(
+                                    param.genericPackage!!.packagename,
+                                    param.genericPackage!!.classname
+                                ).parameterizedBy(it)
+                            } else it
+                        }.copy(nullable = param.nullable)
                     ).build()
                 })
                 .addParameter(

@@ -67,7 +67,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation kotlin('stdlib-common')
-                implementation "de.ffuf.kotlin.multiplatform.annotations:annotations-jvm:$plugin_version"
+                implementation "de.ffuf.kotlin.multiplatform.annotations:annotations:$plugin_version"
 
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.0"
             }
@@ -83,8 +83,6 @@ kotlin {
         jsMain {
             dependencies {
                 implementation kotlin('stdlib-js')
-                implementation "de.ffuf.kotlin.multiplatform.annotations:annotations-js:$plugin_version"
-
             }
         }
         jsTest {
@@ -96,7 +94,6 @@ kotlin {
         jvmMain {
             dependencies {
                 implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-                implementation "de.ffuf.kotlin.multiplatform.annotations:annotations-jvm:$plugin_version"
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.0"
             }
         }
@@ -108,7 +105,6 @@ kotlin {
         }
         iosX64Main {
             dependencies {
-                implementation "de.ffuf.kotlin.multiplatform.annotations:annotations-iosx64:$plugin_version"
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.0"
             }
         }

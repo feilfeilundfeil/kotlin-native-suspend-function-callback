@@ -78,14 +78,14 @@ repositories {
 }
 
 plugins {
-   id("native-suspend-function") version "1.0.15"
-    // or as dependency: "de.ffuf.kotlin.multiplatform.processor:nativesuspendfunction:1.0.15"
+   id("native-suspend-function") version "1.0.18"
+    // or as dependency: "de.ffuf.kotlin.multiplatform.processor:nativesuspendfunction:1.0.18"
 }
 
 // also add the annotations as dependency:
 dependencies {
     // multiplatform binaries are ready - please have a look at the example project
-    implementation("de.ffuf.kotlin.multiplatform.annotations:annotations:1.0.17")
+    implementation("de.ffuf.kotlin.multiplatform.annotations:annotations:1.0.18")
 }
 
 ```

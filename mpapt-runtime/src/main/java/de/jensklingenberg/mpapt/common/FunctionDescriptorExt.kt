@@ -23,16 +23,25 @@ fun FunctionDescriptor.getFunctionParameters(): List<FunctionParameter> {
             // normal:
             //value-parameter id: kotlin.Int defined in de.jensklingenberg.mpapt.CommonAnnotated.firstFunction2[ValueParameterDescriptorImpl@725a91a6]
             // Typedefs:
-            //value-parameter id: de.jensklingenberg.mpapt.Datum /* = kotlin.ranges.CharProgression */ defined in de.jensklingenberg.mpapt.CommonAnnotated.firstFunction2[ValueParameterDescriptorImpl@692444bb]
+            //value-parameter id: de.jensklingenberg.mpapt.Datum /* = kotlin.ranges.CharProgression */ defined in de.jensklingenberg.mpapt.CommonAnnotated.firstFunction2[ValueParameterDescriptorImpl@692444bb
+            // Arrays:
+            //value-parameter list: kotlin.collections.List<kotlin.text.Regex> defined in de.jensklingenberg.mpapt.CommonAnnotated.testList[ValueParameterDescriptorImpl@f9c2310]
             val fullPackage = parameter.toString().substringAfter(": ")
                 .substringBefore(" defined")
                 .substringBefore(" /* =")
+            val realValue = fullPackage.substringAfter("<").substringBefore(">")
+            val isGeneric = fullPackage.contains("<")
+            val genericValue = fullPackage.substringBefore("<")
             FunctionParameter(
                 parameter.name.asString(),
                 parameter.type.toString().endsWith("?"),
                 Package(
-                    fullPackage.split(".").last().replace("?", ""),
-                    fullPackage.split(".").dropLast(1).joinToString(".")
+                    realValue.split(".").last().replace("?", ""),
+                    realValue.split(".").dropLast(1).joinToString(".")
+                ),
+                genericPackage = if (!isGeneric) null else Package(
+                    genericValue.split(".").last().replace("?", ""),
+                    genericValue.split(".").dropLast(1).joinToString(".")
                 )
             )
         }.toList()

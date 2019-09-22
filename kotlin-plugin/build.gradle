@@ -133,17 +133,17 @@ kapt {
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: uri("${System.getProperty('user.home')}/.m2/repository"))
+            //repository(url: uri("${System.getProperty('user.home')}/.m2/repository"))
 
             pom.withXml(configureMavenCentralMetadata)
-            /*repository (
+            repository (
                     url: 'https://api.bintray.com/maven/jonasbark/ffuf/nativesuspendfunction-compiler'
             ) {
                 authentication(
                         userName: bintray_user,
                         password: bintray_api_key
                 )
-            }*/
+            }
         }
 
     }

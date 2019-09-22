@@ -23,6 +23,10 @@ class CommonAnnotated {
     suspend fun goToDockingStation(commandHandler: Regex?) =
         Regex("")
 
+    @NativeSuspendedFunction
+    suspend fun testList(list: List<Regex>) =
+        Regex("")
+
     @ExperimentalCoroutinesApi
     @NativeFlowFunction
     fun testFlowFunction(test: Int): Flow<CoroutineScope> {
