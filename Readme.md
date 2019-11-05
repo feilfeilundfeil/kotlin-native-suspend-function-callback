@@ -74,7 +74,7 @@ Inside your projects build.gradle(.kts) add the following plugin:
 
 ```groovy
 repositories {
-    maven { url 'https://dl.bintray.com/jonasbark/ffuf' } // should be up on jcenter soon
+    jcenter()
 }
 
 plugins {
@@ -94,7 +94,7 @@ and in your `pluginManagement`:
 pluginManagement {
     repositories {
         // ....
-        maven { url 'https://dl.bintray.com/jonasbark/ffuf' } // should be up on jcenter soon
+        jcenter()
     }
     // ....
     resolutionStrategy {
